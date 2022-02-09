@@ -48,10 +48,6 @@ const scoreWord = (knownGoodLetters: KnownGoodLetter[], knownBadLetters: KnownBa
         let result = 0;
         const letters = getUniqueLetters(word);
 
-        // if the word contains bad letters, it's worthless
-        knownBadLetters.forEach(badLetter => {
-            
-        });
         for(let i = 0; i < knownBadLetters.length; i++){
             if(letters.findIndex(x=>x == knownBadLetters[i]) > -1)
                 return -100;
@@ -59,11 +55,15 @@ const scoreWord = (knownGoodLetters: KnownGoodLetter[], knownBadLetters: KnownBa
         
         for(let i = 0; i < knownGoodLetters.length; i++) {
             const goodLetter = knownGoodLetters[i];
-            //if the word doesn't match perfect letters, it's worthless
-            if(goodLetter.position != null && word[goodLetter.position] != goodLetter.letter)
+            //if the word doesn't match perfect letters, don't use the word
+            if(goodLetter.correctPosition && word[goodLetter.position] != goodLetter.letter)
                 return -100;
-            // if the word doesn't contain good letter, it's worthless
-            if(goodLetter.position == null && letters.indexOf(goodLetter.letter) == -1)
+            // if the word doesn't contain good letter, don't use the word
+            if(!goodLetter.correctPosition && letters.indexOf(goodLetter.letter) == -1)
+                return -100;
+            
+            // if the word contains a good letter, but the good letter is in a spot that was already checked that letter for, don't use the word
+            if(!goodLetter.correctPosition && word[goodLetter.position] == goodLetter.letter)
                 return -100;
         }
 
@@ -84,12 +84,13 @@ const getAllWordsWithScores = (knownLetters: KnownLetters) => {
 }
 
 export const getMostLikelyWord = (invalidWordService: InvalidWordService) => (knownLetters: KnownLetters) => {
-    const wordsWithScores = getAllWordsWithScores(knownLetters);
-
-    return wordsWithScores
+    const wordsWithScores = getAllWordsWithScores(knownLetters)
         .filter(x=> !invalidWordService.checkIsInvalidWord(x.word))
-        .reduce((prev,cur) => prev.score > cur.score ? prev: cur)
-        .word;
+        .sort((a,b)=> b.score - a.score);
+    
+    console.log(wordsWithScores.slice(0, 10))
+
+    return wordsWithScores[0].word;
 }
 
 const create = (invalidWordService: InvalidWordService) => {
