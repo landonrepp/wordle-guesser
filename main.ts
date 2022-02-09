@@ -2,7 +2,6 @@ import playwright, { ElementHandle } from "playwright";
 import { GameTile, GameTileEvaluation, KnownGoodLetter, Letter, KnownLetters } from "./src/types";
 import WordService from "./src/word-service";
 import PageInteractionService from './src/page-interaction-service';
-import InvalidWordService from './src/invalid-word-service'
 
 function delay(ms: number) {
   return new Promise( resolve => setTimeout(resolve, ms) );
@@ -34,8 +33,7 @@ async function main() {
   await page.click('.close-icon');
 
   const pageInteractionService = PageInteractionService.create(page);
-  const invalidWordService = InvalidWordService.create();
-  const wordService = WordService.create(invalidWordService);
+  const wordService = WordService.create();
 
   let knownLetters: KnownLetters = {
     knownBadLetters: [],
@@ -47,11 +45,6 @@ async function main() {
     console.log(mostLikelyWord);
     await delay(1500);
     await pageInteractionService.typeWord(mostLikelyWord);
-    const wordIsInvalid = await pageInteractionService.isWordInvalid();
-    if(wordIsInvalid){
-      await pageInteractionService.backspaceWord();
-      invalidWordService.setInvalidWord(mostLikelyWord);
-    }
     
     const results = await pageInteractionService.collectResults();
     const correct = containsCorrectAnswer(results);
