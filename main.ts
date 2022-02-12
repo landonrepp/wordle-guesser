@@ -36,8 +36,8 @@ async function main() {
     knownBadLetters: [],
     knownGoodLetters: []
   }
-
-  for(let i = 0; i < 5; i++){
+  let i = 0;
+  for(i = 0; i < 5; i++){
     const mostLikelyWord = wordService.getMostLikelyWord(knownLetters);
     console.log(mostLikelyWord);
     await delay(1500);
@@ -50,16 +50,20 @@ async function main() {
     
     const results = await pageInteractionService.collectResults();
     const correct = containsCorrectAnswer(results);
-    
+
     if(correct){
       console.log(`correct answer: ${mostLikelyWord}`);
-      await browser.close();
-      return;
+      break;
     }
 
     knownLetters = pageInteractionService.formatResultsAsKnownLetters(results);
     console.log(results);
     console.log("---");
   }
+  if(i == 5){
+    console.log("game failed");
+  }
+
+  await browser.close();
 }
 main();
