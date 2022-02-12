@@ -18,6 +18,11 @@ const containsCorrectAnswer = (results: GameTile[][]) => {
       
 }
 
+const isGameOver = (results: GameTile[][]) => {
+  return results
+    .every(row=> row.every(tile => tile.revealed));
+}
+
 async function main() {
   const browser = await playwright.chromium.launch({
     headless: false,
@@ -36,8 +41,8 @@ async function main() {
     knownBadLetters: [],
     knownGoodLetters: []
   }
-  let i = 0;
-  for(i = 0; i < 5; i++){
+  let gameOver = false;
+  while(!gameOver){
     const mostLikelyWord = wordService.getMostLikelyWord(knownLetters);
     console.log(mostLikelyWord);
     await delay(1500);
@@ -50,6 +55,7 @@ async function main() {
     
     const results = await pageInteractionService.collectResults();
     const correct = containsCorrectAnswer(results);
+    gameOver = isGameOver(results);
 
     if(correct){
       console.log(`correct answer: ${mostLikelyWord}`);
@@ -60,8 +66,8 @@ async function main() {
     console.log(results);
     console.log("---");
   }
-  if(i == 5){
-    console.log("game failed");
+  if(gameOver){
+    console.log("game over");
   }
 
   await browser.close();
