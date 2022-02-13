@@ -61,7 +61,7 @@ async function main() {
   if(gameOver){
     console.log("game over");
   }
-
+  
   await browser.close();
 }
 main();

@@ -6,6 +6,8 @@
   "scripts": {
     "test": "playwright test --headed",
     "start": "tsc && node dist/main.js",
+    "build": "tsc",
+    "start:nobuild": "node dist/main.js",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
