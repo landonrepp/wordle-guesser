@@ -3,7 +3,8 @@ export type Letter = "a"| "b"| "c"| "d"| "e"| "f"| "g"| "h"| "i"| "j"| "k"| "l"|
 
 export type KnownGoodLetter = {
     letter: Letter,
-    position: number | null
+    position: number,
+    correctPosition: boolean
 }
 
 export type KnownBadLetter = Letter;

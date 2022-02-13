@@ -36,29 +36,32 @@ const isWordInvalid = (page: Page) => async () => {
 
 const formatResultsAsKnownLetters = (gameTiles: GameTile[][]) => {
     const flatGameTiles = gameTiles.flat().filter(x => x.letter != null);
-    const uniqueGameTiles: GameTile[] = [];
+    const neededGameTiles: GameTile[] = [];
     flatGameTiles.forEach(tile => {
-        const gameTileIdx = uniqueGameTiles.findIndex(x => x.letter == tile.letter);
-        if (gameTileIdx == -1) {
-            uniqueGameTiles.push(tile);
-            return;
+        const oldTile = neededGameTiles.find(x => x.letter == tile.letter);
+        const oldTileIdx = neededGameTiles.findIndex(x => x == oldTile);
+        if (oldTile == null) {
+            neededGameTiles.push(tile);
         }
-        if (tile.evaluation == 'correct') {
-            uniqueGameTiles[gameTileIdx] = tile;
-            return;
+        else if ((tile.evaluation != 'absent' && oldTile.evaluation == 'absent')) {
+            neededGameTiles[oldTileIdx] = tile;
+        }
+        else if(tile.evaluation != 'absent') {
+            neededGameTiles.push(tile);
         }
     });
 
     const result: KnownLetters = {
-        knownBadLetters: uniqueGameTiles
+        knownBadLetters: neededGameTiles
             .filter(x => x.evaluation == 'absent')
             .map(x => x.letter as Letter),
-        knownGoodLetters: uniqueGameTiles
+        knownGoodLetters: neededGameTiles
             .filter(x => x.evaluation != 'absent')
             .map(x => {
                 const goodLetter: KnownGoodLetter = {
                     letter: x.letter as Letter,
-                    position: x.evaluation == 'correct' ? x.position : null,
+                    position: x.position,
+                    correctPosition: x.evaluation == 'correct'
                 }
                 return goodLetter;
             })

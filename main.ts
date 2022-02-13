@@ -63,7 +63,6 @@ async function main() {
     }
 
     knownLetters = pageInteractionService.formatResultsAsKnownLetters(results);
-    console.log(results);
     console.log("---");
   }
   if(gameOver){
