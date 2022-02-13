@@ -1,4 +1,3 @@
-import { InvalidWordService } from './invalid-word-service';
 import { KnownBadLetter, Letter, KnownLetters, WordWithScore, KnownGoodLetter } from './types';
 import { words } from './words';
 
@@ -83,9 +82,8 @@ const getAllWordsWithScores = (knownLetters: KnownLetters) => {
     });
 }
 
-export const getMostLikelyWord = (invalidWordService: InvalidWordService) => (knownLetters: KnownLetters) => {
+export const getMostLikelyWord = () => (knownLetters: KnownLetters) => {
     const wordsWithScores = getAllWordsWithScores(knownLetters)
-        .filter(x=> !invalidWordService.checkIsInvalidWord(x.word))
         .sort((a,b)=> b.score - a.score);
     
     console.log(wordsWithScores.slice(0, 10))
@@ -93,9 +91,9 @@ export const getMostLikelyWord = (invalidWordService: InvalidWordService) => (kn
     return wordsWithScores[0].word;
 }
 
-const create = (invalidWordService: InvalidWordService) => {
+const create = () => {
     return {
-        getMostLikelyWord: getMostLikelyWord(invalidWordService)
+        getMostLikelyWord: getMostLikelyWord()
     }
 }
 
