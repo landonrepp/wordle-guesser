@@ -30,7 +30,7 @@ async function main() {
   const page = await browser.newPage();
 
   await page.goto('https://www.nytimes.com/games/wordle/index.html');
-  await page.click('.close-icon');
+  await page.click('svg[data-testid="icon-close"]');
 
   const pageInteractionService = PageInteractionService.create(page);
   const wordService = WordService.create();
@@ -45,8 +45,9 @@ async function main() {
     console.log(mostLikelyWord);
     await delay(1500);
     await pageInteractionService.typeWord(mostLikelyWord);
-    
+    await delay(2000);
     const results = await pageInteractionService.collectResults();
+    console.log(results);
     const correct = containsCorrectAnswer(results);
     gameOver = isGameOver(results);
 

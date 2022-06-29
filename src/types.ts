@@ -14,7 +14,7 @@ export type WordWithScore = {
     score: number
 }
 
-export type GameTileEvaluation = "absent" | "present" | "correct" | null;
+export type GameTileEvaluation = "absent" | "present" | "correct";
 
 export type GameTile = {
     letter: Letter | null

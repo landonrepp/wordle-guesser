@@ -2,22 +2,23 @@ import { ElementHandle, Page } from "playwright";
 import { GameTile, GameTileEvaluation, KnownGoodLetter, KnownLetters, Letter } from "./types";
 
 const typeWord = (page: Page) => async (word: string) => {
-    const board = page.locator("#board");
+    const board = page.locator('#wordle-app-game');
     [...word].forEach(async letter => {
         await board.press(letter);
     });
-    await board.press("Enter");
+    await board.press('Enter');
 }
 const collectResults = (page: Page) => async () => {
-    const gameTiles = await page.$$("#board game-tile");
+    const gameTiles = await page.$$('#wordle-app-game div[data-testid="tile"]');
     const gameRows: ElementHandle<SVGElement | HTMLElement>[][] = [];
     while (gameTiles.length) gameRows.push(gameTiles.splice(0, 5));
     return await Promise.all(gameRows.map(async row => {
         return await Promise.all(row.map(async (tile, idx) => {
+            const evaluation = await tile.getAttribute('data-state');
             const gameTile: GameTile = {
-                letter: await tile.getAttribute("letter") as (Letter | null),
-                evaluation: await tile.getAttribute("evaluation") as GameTileEvaluation,
-                revealed: (await tile.getAttribute("reveal")) == '',
+                letter: await tile.textContent() as (Letter | null),
+                evaluation: evaluation == 'empty'? 'absent' : evaluation as GameTileEvaluation,
+                revealed: (await tile.getAttribute('data-state')) != 'empty',
                 position: idx
             }
             return gameTile;
