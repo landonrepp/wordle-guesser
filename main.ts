@@ -4,22 +4,20 @@ import WordService from "./src/word-service";
 import PageInteractionService from './src/page-interaction-service';
 
 function delay(ms: number) {
-  return new Promise( resolve => setTimeout(resolve, ms) );
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
 const containsCorrectAnswer = (results: GameTile[][]) => {
-  return results
-    .map(x=>x
-      .map(x=>x.evaluation == 'correct')
-      .reduce((prev, cur) => prev && cur, true))
-    .reduce((prev, cur) => prev || cur, false);
-      
+  const letterIsCorrect = (x: GameTile) => x.evaluation == 'correct';
+  const wordIsCorrectAnswer = (x: GameTile[]) => x.every(letterIsCorrect);
+  const listContainsCorrectWord = results.some(wordIsCorrectAnswer);
+  return listContainsCorrectWord;
 }
 
 const isGameOver = (results: GameTile[][]) => {
   return results
-    .every(row=> row.every(tile => tile.revealed));
+    .every(row => row.every(tile => tile.revealed));
 }
 
 async function main() {
@@ -40,7 +38,7 @@ async function main() {
     knownGoodLetters: []
   }
   let gameOver = false;
-  while(!gameOver){
+  while (!gameOver) {
     const mostLikelyWord = wordService.getMostLikelyWord(knownLetters);
     console.log(mostLikelyWord);
     await delay(1500);
@@ -51,7 +49,7 @@ async function main() {
     const correct = containsCorrectAnswer(results);
     gameOver = isGameOver(results);
 
-    if(correct){
+    if (correct) {
       console.log(`correct answer: ${mostLikelyWord}`);
       break;
     }
@@ -59,10 +57,10 @@ async function main() {
     knownLetters = pageInteractionService.formatResultsAsKnownLetters(results);
     console.log("---");
   }
-  if(gameOver){
+  if (gameOver) {
     console.log("game over");
   }
-  
+
   await browser.close();
 }
 main();
